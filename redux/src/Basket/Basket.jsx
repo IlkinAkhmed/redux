@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { addbasket, increase, decrease, remove } from "./BasketSlice";
+import { addWishlist } from "../Wishlist/WishlistSlice";
 
 function Basket() {
   const [data, setData] = useState([]);
@@ -12,43 +13,80 @@ function Basket() {
   }, []);
 
   const basketArr = useSelector((state) => state.basket.value);
+  const wishlistArr = useSelector((state) => state.wishlist.value);
   const dispatch = useDispatch();
 
+  useEffect(() => {
+    localStorage.setItem('basketArr',JSON.stringify(basketArr))
+  }, [basketArr])
+  
 
   return (
     <>
-      <div style={{ backgroundColor: 'gray', color: 'white' }} className="basket">
+      <div
+        style={{ backgroundColor: "gray", color: "white" }}
+        className="basket"
+      >
         <h1>BASKET</h1>
         {basketArr &&
           basketArr.map((x) => (
             <div key={x.id}>
-              <hr />
               <ul>
                 <li>{x.name}</li>
                 <li>{x.description}</li>
-                <button onClick={() => dispatch(increase(x))}>+</button>
-                <span>{x.count}</span>
-                <button onClick={() => dispatch(decrease(x))}>-</button>
-                <button onClick={() => dispatch(remove(x))}>delete</button>
-              </ul>
+                <button
+                  style={{ cursor: "pointer" }}
+                  onClick={() => dispatch(increase(x))}
+                >
+                  +
+                </button>
+                <span style={{ padding: "0 10px" }}>{x.count}</span>
+                <button
+                  style={{ cursor: "pointer" }}
+                  onClick={() => dispatch(decrease(x))}
+                >
+                  -
+                </button>
+                <i
+                  style={{ cursor: "pointer", padding: "0 10px" }}
+                  className="fa-solid fa-trash-can"
+                  onClick={() => dispatch(remove(x))}
+                ></i>
               <hr />
+              </ul>
             </div>
           ))}
       </div>
-      <div style={{ backgroundColor: 'black', color: 'white' }}>
-        <h1>SHOP</h1>
+      <div style={{ backgroundColor: "black", color: "white" }}>
+        <h1>SHOPPING</h1>
         {data &&
           data.map((x) => (
             <>
-              <ul style={{ backgroundColor: 'black', color: 'white' }} key={x.id}>
+              <ul
+                key={x.id}
+              >
                 <li>{x.name}</li>
                 <li>{x.description}</li>
-                <button onClick={() => dispatch(addbasket({ ...x, count: 1 }))}>add</button>
+                <i
+                  className="fa-solid fa-bag-shopping"
+                  style={{ cursor: "pointer",fontSize:'25px' }}
+                  onClick={() => dispatch(addbasket({ ...x, count: 1 }))}
+                >
+                  
+                </i>
+                <i
+                  onClick={() => dispatch(addWishlist(x))}
+                  style={{ cursor: "pointer", padding: "0 10px",fontSize:'25px'  }}
+                  className={`${
+                    wishlistArr.find((item) => item.id === x.id)
+                      ? "fa-solid"
+                      : "fa-regular"
+                  } fa-heart`}
+                ></i>
                 <hr />
               </ul>
             </>
           ))}
-
       </div>
     </>
   );
